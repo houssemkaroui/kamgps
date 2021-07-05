@@ -10,10 +10,11 @@ router.post(
   authController.signup
 );
 router.post('/login', authController.login);
+router.post('/loginAdmin', authController.loginAdmin);
 router.post('/codeVerification', authController.VeriferCodeSMS);
 router.post('/forgotPassword', authController.forgotPassword);
 router.patch('/resetPassword', authController.resetPassword);
-// Protect all routes after this middleware
+
 router.use(authController.protect);
 router.get('/Me', userController.getMe, userController.getUser);
 router.patch('/updateIDdevice',authController.ajouterIDdeviece)

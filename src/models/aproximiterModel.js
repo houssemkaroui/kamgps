@@ -1,6 +1,6 @@
 
 const mongoose = require('mongoose');
-const favoriteSchema = new mongoose.Schema({
+const aproximiterSchema = new mongoose.Schema({
     name: {
         type: String,
     },
@@ -14,10 +14,10 @@ const favoriteSchema = new mongoose.Schema({
     },
     photo: {
         type: String,
-        default: 'default.jpg',
         required: true
 
     },
+    
     location: {
 
         lat: {
@@ -30,10 +30,14 @@ const favoriteSchema = new mongoose.Schema({
         }
 
     },
+    country :{
+        type:String,
+        required:true
+    },
     status: {
         type: String,
         enum: ['private', 'public'],
-        default: 'private'
+        default: 'public'
     },
     createdAt: {
         type: Date,
@@ -41,15 +45,15 @@ const favoriteSchema = new mongoose.Schema({
 
     },
 
-    userId: {
-        type: mongoose.Schema.ObjectId,
-        ref: 'User',
-        required: true
-    },
+    // userId: {
+    //     type: mongoose.Schema.ObjectId,
+    //     ref: 'User',
+    //     required: true
+    // },
    
 });
 
-favoriteSchema.pre(/^find/, function (next) {
+aproximiterSchema.pre(/^find/, function (next) {
     this.populate({
         path: 'User',
         select: 'name'
@@ -57,6 +61,6 @@ favoriteSchema.pre(/^find/, function (next) {
     next();
 });
 
-const Favorite = mongoose.model('Favorite', favoriteSchema);
-module.exports = Favorite;
+const Aproximiter = mongoose.model('Aproximiter', aproximiterSchema);
+module.exports = Aproximiter;
 

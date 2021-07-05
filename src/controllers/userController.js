@@ -66,7 +66,7 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   filteredBody.name = req.body.name
   filteredBody.eamil = req.body.email
   filteredBody.address = req.body.address
-  filteredBody.lat = req.body.lat
+  filteredBody.lat = req.body.lat     
   filteredBody.lng = req.body.lng
   // 3) Update user document
   const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {

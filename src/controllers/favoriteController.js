@@ -6,7 +6,7 @@ const factory = require('./handlerFactory');
 //ajouter ala liste favorite
 exports.AjouterFavorite = catchAsync(async(req,res,next) =>{
     if(!req.body) {
-        return next (new AppError('if faut saissire les donnes ',400))
+        return next (new AppError('if faut saissire les donnes',400))
     }
     if (req.file) req.body.photo = req.file.filename;
 

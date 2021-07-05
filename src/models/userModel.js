@@ -65,6 +65,10 @@ const userSchema = new mongoose.Schema({
    required:[true,'chaque utilisateur doit avoir un id divice'],
    default:'1423-9824654822-44f44r55d'
   },
+  country :{
+    type:String,
+    required:true
+  },
 
   active: {
     type: Boolean,

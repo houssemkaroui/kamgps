@@ -19,7 +19,7 @@ const mapsRouter = require('./src/routes/mapsRouters');
 const friendsRouter = require('./src/routes/friendsRoutes');
 const favoriteRouter = require('./src/routes/favoriteRoutes');
 const payementRouter = require('./src/routes/payementRoutes')
-
+const aproximiterRouter =  require('./src/routes/aproximiterRouter')
 
 
 // Start express app
@@ -96,6 +96,7 @@ app.use('/api/v1/maps',mapsRouter);
 app.use('/api/v1/friends',friendsRouter);
 app.use('/api/v1/favorites',favoriteRouter);
 app.use('/api/v1/payements',payementRouter);
+app.use('/api/v1/aproximiter',aproximiterRouter);
 
 
 app.all('*', (req, res, next) => {

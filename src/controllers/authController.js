@@ -18,19 +18,7 @@ const signToken = id => {
     expiresIn: process.env.JWT_EXPIRES_IN
   });
 };
-// const createSendToken = async (user, statusCode, res) => {
-//   const token = await signToken(user._id);
  
-// //  res.cookie('jwt', token, cookieOptions);
-//   user.password = undefined;
-//   res.status(statusCode).json({
-//     status: 'success',
-//     token,
-//    data: {
-//       user
-//     }
-//   });
-// };
 //regester user
 exports.signup = catchAsync(async (req, res, next) => {
   if (!req.body) {
@@ -57,7 +45,7 @@ exports.login = catchAsync(async (req, res, next) => {
   const { phonenumber, password } = req.body;
   // 1) Check if email and password exist
   if (!phonenumber || !password) {
-    return next(new AppError('Merci de saisir email et password correcte!', 400));
+    return next(new AppError('Merci de saisir phonenumber et password correcte!', 400));
   }
 
   // 2) Check if user exists && password is correct
@@ -72,15 +60,41 @@ exports.login = catchAsync(async (req, res, next) => {
   if (!user || !(await user.correctPassword(password, user.password))) {
     return next(new AppError('Incorrect téléphone ou mot de passe inco', 401));
   }
-  // if(!req.body.IDdevice) {
-  //   return next(new AppError('ajouter votre id device',400))
-  // }
+
+  const token = await signToken(user._id);
+  user.password = undefined;
   
-  // user.IDdevice = req.body.IDdevice
- // user.passwordConfirm =req.body.password
- // user.password = req.body.password
-  //await user.save();
-  // 3) If everything ok, send token to client
+  res.status(200).json({
+    status: 'success',
+    token,
+    data: {
+      user
+    }
+  });
+ // createSendToken(user, 200, res)
+});
+
+
+exports.loginAdmin = catchAsync(async (req, res, next) => {
+  const { email, password } = req.body;
+  // 1) Check if email and password exist
+  if (!email || !password) {
+    return next(new AppError('Merci de saisir email et password correcte!', 400));
+  }
+
+  // 2) Check if user exists && password is correct
+  const user = await User.findOne({ email }).select('+password');
+  if (!user) {
+    return next(new AppError("téléphone ou bien mot de passe incorrect", 400));
+  }
+  if (user.active == false) {
+    return next(new AppError("Vous n'avez pas les droits d'accés!", 400));
+  }
+
+  if (!user || !(await user.correctPassword(password, user.password))) {
+    return next(new AppError('Incorrect téléphone ou mot de passe inco', 401));
+  }
+
   const token = await signToken(user._id);
   user.password = undefined;
   
