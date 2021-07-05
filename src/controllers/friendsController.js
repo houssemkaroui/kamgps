@@ -7,7 +7,11 @@ const User = require('../models/userModel')
 const notification = require('../models/notificationModel');
 const socket = require('../../server');
 const APIFeatures = require("../utils/apiFeatures");
-
+const { response } = require("../../app");
+const client = require('twilio')(
+  process.env.TWILIO_ACCOUNT_SID2,
+  process.env.TWILIO_AUTH_TOKEN2
+);
 // 1 recherche un amis dans dans la base 
 exports.rechercheAmis = catchAsync(async (req, res, next) => {
   // socket.ioObject.sockets.emit("userdata", "How are You ?");
@@ -19,12 +23,12 @@ exports.rechercheAmis = catchAsync(async (req, res, next) => {
   if (!user) {
     return next(new AppError("il n'y a aucun utilisateur avec cette numero", 400))
   }
-  const notif = await notification.find({$or:[{$and:[{ idSender: user._id }, { idReciverd: req.user.id },{ status: "encours" }]},{$and:[{ idSender: req.user.id }, { idReciverd: user._id },{ status: "encours" }]}]})
-  if(notif.length != 0) {
-    return next(new AppError("vous avez déja envoyé une invitation",400))
+  const notif = await notification.find({ $or: [{ $and: [{ idSender: user._id }, { idReciverd: req.user.id }, { status: "encours" }] }, { $and: [{ idSender: req.user.id }, { idReciverd: user._id }, { status: "encours" }] }] })
+  if (notif.length != 0) {
+    return next(new AppError("vous avez déja envoyé une invitation", 400))
   }
-  const data = await Friend.find({$or:[{$and:[{ IDFriend: user._id }, { userId: req.user.id }]},{$and:[{ IDFriend: req.user.id }, { userId: user._id }]}]})
-   if (data.length != 0) {
+  const data = await Friend.find({ $or: [{ $and: [{ IDFriend: user._id }, { userId: req.user.id }] }, { $and: [{ IDFriend: req.user.id }, { userId: user._id }] }] })
+  if (data.length != 0) {
     res.status(200).send({
       message: 'tu es déjà ami avec lui'
     })
@@ -66,15 +70,15 @@ exports.demandeAmis = catchAsync(async (req, res, next) => {
       return next(new AppError("il ya un erreur lors de l'envoie de notification", 400));
     }
     var body = new notification({
-      contents:req.body.contents,
-      headings:req.body.headings,
-      status:req.body.status,
-      setLocationByfriend:req.body.setLocationByfriend,
-      type:req.body.type,
-      location:req.body.location,
-      idSender:req.user.id,
-      idReciverd : recived._id,
-      createdAt:new Date()
+      contents: req.body.contents,
+      headings: req.body.headings,
+      status: req.body.status,
+      setLocationByfriend: req.body.setLocationByfriend,
+      type: req.body.type,
+      location: req.body.location,
+      idSender: req.user.id,
+      idReciverd: recived._id,
+      createdAt: new Date()
     })
     socket.ioObject.sockets.emit("data", body);
     res.status(200).send({
@@ -94,51 +98,51 @@ exports.demendeAccepterFriends = catchAsync(async (req, res) => {
   if (!req.user.id) {
     return next(new AppError('verifer votre token ', 401))
   }
-  
-  const notif = await notification.findOneAndUpdate({_id:req.body.id},{ status: req.body.status });
-    req.body.userId = req.user.id
-    var friend1 = new Friend({
-      userId:req.user.id,
-      IDFriend:req.body.IDFriend
-    })
-    var friend2 = new Friend({
-      userId:req.body.IDFriend,
-      IDFriend:req.user.id
-    })
-    const data1 = await Friend.create(friend1)
-    const data2 = await Friend.create(friend2)
-    if (!data) {
-      return next(new AppError("il ya un err lors de l'ajout ala liste d'amis "))
-    }
-    res.status(201).send({
-     // data: data,
-      message: `Votre demande ${req.body.status}`,
-    })
+
+  const notif = await notification.findOneAndUpdate({ _id: req.body.id }, { status: req.body.status });
+  req.body.userId = req.user.id
+  var friend1 = new Friend({
+    userId: req.user.id,
+    IDFriend: req.body.IDFriend
+  })
+  var friend2 = new Friend({
+    userId: req.body.IDFriend,
+    IDFriend: req.user.id
+  })
+  const data1 = await Friend.create(friend1)
+  const data2 = await Friend.create(friend2)
+  if (!data) {
+    return next(new AppError("il ya un err lors de l'ajout ala liste d'amis "))
+  }
+  res.status(201).send({
+    // data: data,
+    message: `Votre demande ${req.body.status}`,
+  })
 
 });
 
 //recherche dans ma liste de friend 
-exports.recherchFreinds = catchAsync(async(req,res,next) =>{
+exports.recherchFreinds = catchAsync(async (req, res, next) => {
   const { phonenumber } = req.body
 
-  if(!req.user.id) {
-    return next (new AppError("verifer votre token ",401))
+  if (!req.user.id) {
+    return next(new AppError("verifer votre token ", 401))
   }
-  const user = await User.findOne({phonenumber})
-  if(!user) {
-    return next(new AppError('il n ya pas de friends avec cette phone number',400))
+  const user = await User.findOne({ phonenumber })
+  if (!user) {
+    return next(new AppError('il n ya pas de friends avec cette phone number', 400))
   }
 
-  const data = await Friend.find({$or:[{$and:[{ userId: req.user.id }, { IDFriend: user._id }]},{$and:[{ userId: user._id }, { IDFriend: req.user.id }]}]})
-   if(data.length !=0){
-     res.status(200).send({
-       data:user
-     })
-   }else{
-     res.status(200).send({
-       message:"vous n'êtes pas des amis"
-     })
-   }
+  const data = await Friend.find({ $or: [{ $and: [{ userId: req.user.id }, { IDFriend: user._id }] }, { $and: [{ userId: user._id }, { IDFriend: req.user.id }] }] })
+  if (data.length != 0) {
+    res.status(200).send({
+      data: user
+    })
+  } else {
+    res.status(200).send({
+      message: "vous n'êtes pas des amis"
+    })
+  }
 
 
 })
@@ -150,7 +154,7 @@ exports.SendNotification = catchAsync(async (req, res, next) => {
     return next(new AppError('Merci de saisir un numéro de téléphone  correcte!', 400));
   }
   const recived = await User.findOne({ phonenumber });
-  
+
   if (!recived) {
     return next(new AppError("il n'existe aucun utilisateur avec cette numéro de téléphone", 400));
   }
@@ -224,14 +228,14 @@ exports.getUserNotification = catchAsync(async (req, res, next) => {
     return next(new AppError('verifer votre token', 401))
   }
   const doc = await notification.find({ $or: [{ idReciverd: req.user.id }, { idSender: req.user.id }] })
-  .populate([{
-    path: 'idReciverd ',
-    select: 'name phonenumber',
-  },{
+    .populate([{
+      path: 'idReciverd ',
+      select: 'name phonenumber',
+    }, {
       path: 'idSender',
       select: 'name phonenumber'
-    
-  }]);
+
+    }]);
   if (!doc) {
     return next(new AppError('No notification found with that ID', 404));
   }
@@ -272,7 +276,7 @@ exports.repenseDemende = catchAsync(async (req, res, next) => {
   };
   req.body.type = 'recived';
   req.body.setLocationByfriend = req.body.setLocationByfriend;
-  
+
   const sendNotification = await axios.request(options);
   if (!sendNotification) {
     return next(new AppError("il ya un erreur lors de l'envoie de notification", 400));
@@ -315,15 +319,68 @@ exports.updateFriend = factory.updateOne(Friend);
 exports.deleteFriend = factory.deleteOne(Friend);
 exports.deleteNotification = factory.deleteOne(notification);
 
-exports.deleteTowFriend = catchAsync(async(req,res,next) =>{
-  var data = await Friend.deleteMany({$or:[{$and:[{ userId: req.user.id }, { IDFriend: req.body.IDFriend }]},{$and:[{ userId: req.body.IDFriend }, { IDFriend:req.user.id }]}]});
-  if(!data) {
-     return next(new AppError("erreur lors de suppression de friend"))
+exports.deleteTowFriend = catchAsync(async (req, res, next) => {
+  var data = await Friend.deleteMany({ $or: [{ $and: [{ userId: req.user.id }, { IDFriend: req.body.IDFriend }] }, { $and: [{ userId: req.body.IDFriend }, { IDFriend: req.user.id }] }] });
+  if (!data) {
+    return next(new AppError("erreur lors de suppression de friend"))
   }
   res.status(200).send({
-    message:'Friends delete'
+    message: 'Friends delete'
   })
 })
-// socket.ioObject.sockets.in("_room" + req.body.id).emit("msg", "How are You ?");
+
+//envoyer sms 
+exports.sendSmS = catchAsync(async (req, res, next) => {
+//   if(!req.user.id) {
+//     return next(new AppError("verifer votre token"))
+//   }
+
+
+//   const credentials = {
+//     apiKey: 'd592752ee79430fbd8c5dde7f79ccb349b57399dbe476a23b7d234d436385470',
+//     username: 'kamgpse',
+//   }
+
+//   // Initialize the SDK
+//   const AfricasTalking = require('africastalking')(credentials);
+
+//   // Get the SMS service
+//   const sms = AfricasTalking.SMS;
+
+//   const options = {
+//     // Set the numbers you want to send to in international format
+//     to: `+${req.body.phonenumber}`,
+//     // Set your message
+//     message: "I'm a lumberjack and its ok, I sleep all night and I work all day",
+// }
+
+// const data = await sms.send(options);
+// response.send('invite envoyer')
+   
+
+// const data = await  client.messages
+//     .create({
+//       body: 'McAvoy or Stewart? These timelines can get so confusing.',
+//       from:  `+${12673135987}`,
+//       statusCallback: 'http://postb.in/1234abcd',
+//       to: `+${21694491458}`
+//     })
+   
+// console.log(data)
+const accountSid = 'ACf14fba53a443d62dce97020892a9cad5'; 
+const authToken = '027212087386e25bd51af35e0e1f8783'; 
+const client = require('twilio')(accountSid, authToken); 
+ 
+client.messages 
+      .create({ 
+         body: 'test finale',  
+         messagingServiceSid: 'MG5f906cc65ee9a426f21106a732ea93f4',      
+         to: '+21694491458' 
+       }) 
+      .then(message => console.log(message)) 
+      .done();
+      res.send('okkkk')
+
+});
 
 

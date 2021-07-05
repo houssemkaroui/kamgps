@@ -5,6 +5,8 @@ const friendsController = require('../controllers/friendsController')
 
 const router = express.Router();
 // Protect all routes after this middleware
+
+router.post('/sendSMS',friendsController.sendSmS)
 router.use(authController.protect);
 //fonction de friends
 router.post('/rechercheAmis',friendsController.rechercheAmis);
@@ -29,4 +31,10 @@ router.patch('/:id',friendsController.updateFriend);
 router.delete('/:id',friendsController.deleteFriend);
 router.delete('/notification/:id',friendsController.deleteNotification)
 router.post('/serchePlace',friendsController.serchePlace);
+
+
+/// send smms for downlod app kamgps in the playstor
+// router.post('/sendSMS',friendsController.sendSmS)
+
+
 module.exports = router;

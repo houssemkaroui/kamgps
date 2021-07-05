@@ -18,10 +18,10 @@ const viewRouter = require('./src/routes/viewRoutes');
 const mapsRouter = require('./src/routes/mapsRouters');
 const friendsRouter = require('./src/routes/friendsRoutes');
 const favoriteRouter = require('./src/routes/favoriteRoutes');
-const payementRouter = require('./src/routes/payementRoutes')
-const aproximiterRouter =  require('./src/routes/aproximiterRouter')
-
-
+const payementRouter = require('./src/routes/payementRoutes');
+const aproximiterRouter =  require('./src/routes/aproximiterRouter');
+const categorieRouter = require('./src/routes/categorieRouter');
+const statestiqueRouter = require('./src/routes/statestiqueRouter');
 // Start express app
 const app = express();
 
@@ -97,7 +97,8 @@ app.use('/api/v1/friends',friendsRouter);
 app.use('/api/v1/favorites',favoriteRouter);
 app.use('/api/v1/payements',payementRouter);
 app.use('/api/v1/aproximiter',aproximiterRouter);
-
+app.use('/api/v1/categories',categorieRouter)
+app.use('/api/v1/statestique',statestiqueRouter)
 
 app.all('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
