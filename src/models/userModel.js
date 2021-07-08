@@ -21,7 +21,6 @@ const userSchema = new mongoose.Schema({
       message: 'Votre numero doit etre au minimum 10 characters'
     }
   },
-
   email: {
     type: String,
     required: [true, 'Please provide your email'],
@@ -33,7 +32,6 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: 'default.jpg',
     required: true
-
   },
   role: {
     type: String,
@@ -51,7 +49,6 @@ const userSchema = new mongoose.Schema({
     select: false
     // validate: [validator.is, 'Please provide a valid email']
   },
-
   lat: {
     type: String,
     required: true
@@ -69,7 +66,10 @@ const userSchema = new mongoose.Schema({
     type:String,
     required:true
   },
-
+  CountryCode:{
+    type:String,
+   required:true
+   },
   active: {
     type: Boolean,
     default: false,
@@ -77,14 +77,12 @@ const userSchema = new mongoose.Schema({
   passwordConfirm: {
     type: String,
     required: [true, 'merci de confirmer votre  mot de passe '],
-
     validate: {
       // This only works on CREATE and SAVE!!!
       validator: function (el) {
         return el === this.password;
       },
       message: 'les mots de passe ne sont pas les mêmes!'
-
     },
   },
   passwordChangedAt: Date,
@@ -97,32 +95,20 @@ const userSchema = new mongoose.Schema({
   }
 );
 userSchema.pre('save', async function (next) {
-
   // Only run this function if password was actually modified
   if (!this.isModified('password')) return next();
-
   // Hash the password with cost of 12
   this.password = await bcrypt.hash(this.password, 12);
-
   // Delete passwordConfirm field
   this.passwordConfirm = undefined;
   next();
 });
 
 userSchema.pre('save', function (next) {
-
   if (!this.isModified('password') || this.isNew) return next();
-
   this.passwordChangedAt = Date.now() - 1000;
   next();
 });
-
-// userSchema.pre(/^find/, function(next) {
-//   // this points to the current query
-//   this.find({ active: { $ne: false } });
-//   next();
-// });
-
 
 userSchema.methods.correctPassword = async function (
   candidatePassword,
@@ -131,14 +117,12 @@ userSchema.methods.correctPassword = async function (
   return await bcrypt.compare(candidatePassword, userPassword);
 };
 
-
 userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
   if (this.passwordChangedAt) {
     const changedTimestamp = parseInt(
       this.passwordChangedAt.getTime() / 1000,
       10
     );
-
     return JWTTimestamp < changedTimestamp;
   }
 

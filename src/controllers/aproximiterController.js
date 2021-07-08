@@ -29,23 +29,39 @@ exports.GetListeAproximiter = catchAsync(async(req, res, next) => {
     return next(new AppError("verifer votre token"))
   }
   var { data } = req.body;
-  const parametre = "1000"
-  console.log(req.body.data)
+  const parametre = "10000"
   var tableux = [];
-  const listeAproximiter = await aproximiter.find({ country: req.body.country })
+  const listeAproximiter = await aproximiter.find({ CountryCode: req.body.CountryCode })
   for (var j = 0; j < listeAproximiter.length; j++) {
     var distance = await getDistance(data, listeAproximiter[j].location, 0.01);
-    // console.log(distance)
     var results = await convertDistance(distance, "km");
     if (results < parametre) {
       await tableux.push(listeAproximiter[j])
     }
-
-  }
-  res.status(200).send({
-    results: tableux.length,
-    data: tableux
+    var respence = await listeAproximiter.map((item) => {
+      var distance = getDistance(data, listeAproximiter[j].location, 0.01)
+      return {
+        name: item.name,
+          location: {
+              lat: item.location.lat,
+              lng: item.location.lng
+          },
+          userId:item.userId,
+          photo: item.photo,
+          CountryCode:item.CountryCode,
+          country:item.country,
+          addresse:item.addresse,
+          categorie:item.categorie,
+          status:item.status,
+          distance: convertDistance(distance, "km")
+      }
   })
+  res.status(200).send({
+      data: [...respence],
+      results: [...respence].length
+  })
+  }
+
 });
 
 
