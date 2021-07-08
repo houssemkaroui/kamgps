@@ -18,11 +18,13 @@ exports.deleteOne = Model =>
 
 exports.updateOne = Model =>
   catchAsync(async (req, res, next) => {
+    
+    if (req.file) req.body.photo = req.file.filename;
+
     const doc = await Model.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true
     });
-    console.log(req.file.filename)
     if (!doc) {
       return next(new AppError('No document found with that ID', 404));
     }
@@ -78,6 +80,7 @@ exports.getAll = Model =>
       .paginate();
     // const doc = await features.query.explain();
     const doc = await features.query;
+    console.log(doc)
 
     // SEND RESPONSE
     res.status(200).json({

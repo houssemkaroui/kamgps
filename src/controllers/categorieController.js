@@ -8,7 +8,6 @@ exports.AjouterCategorie = catchAsync(async(req,res,next) =>{
     if(!req.body) {
         return next (new AppError('if faut saissire les donnes',400))
     }
-   
     if(!req.user.id) {
         return next (new AppError("vérifier votre token",401))
     }
@@ -45,3 +44,6 @@ exports.deleteCategories = factory.deleteOne(categorie);
 
 //update categories
 exports.updateCategories = factory.updateOne(categorie);
+
+//get categories
+exports.getCategorie = factory.getOne(categorie);

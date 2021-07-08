@@ -10,10 +10,10 @@ exports.AjouterAproximiter = catchAsync(async (req, res, next) => {
   }
   if (req.file) req.body.photo = req.file.filename;
 
-  //   if(!req.user.id) {
-  //       return next (new AppError("vérifier votre token",401)).zn
-  //   }
-  //  req.body.userId = req.user.id
+    if(!req.user.id) {
+        return next (new AppError("vérifier votre token",401)).zn
+    }
+   req.body.userId = req.user.id
   const data = await aproximiter.create(req.body)
   if (!data) {
     return next(new AppError("l'ajout a la liste des aproximiter failed", 400))
@@ -24,7 +24,7 @@ exports.AjouterAproximiter = catchAsync(async (req, res, next) => {
 
 })
 //get liste favorite by user 
-exports.GetListeAproximiter = catchAsync(async (req, res, next) => {
+exports.GetListeAproximiter = catchAsync(async(req, res, next) => {
   if (!req.user.id) {
     return next(new AppError("verifer votre token"))
   }
@@ -74,24 +74,35 @@ const filterObj = (obj, ...allowedFields) => {
   return newObj;
 };
 
-exports.updateFavorite = catchAsync(async (req, res, next) => {
+// exports.updateApproximiter = catchAsync(async (req, res, next) => {
 
-  // 2) Filtered out unwanted fields names that are not allowed to be updated
-  const filteredBody = filterObj(req.params.id,);
-  if (req.file) filteredBody.photo = req.file.filename;
+//   // 2) Filtered out unwanted fields names that are not allowed to be updated
+//   const filteredBody = filterObj(req.params.id,);
+//   if (req.file) filteredBody.photo = req.file.filename;
 
-  // 3) Update user document
-  const updatedFavorite = await aproximiter.findByIdAndUpdate(req.params.id, filteredBody, {
-    new: true,
-    runValidators: true
-  });
+//   // 3) Update user document
+//   const updatedFavorite = await aproximiter.findByIdAndUpdate(req.params.id, filteredBody, {
+//     new: true,
+//     runValidators: true
+//   });
 
-  res.status(200).json({
-    status: 'success',
-    data: {
-      favorite: updatedFavorite
-    }
-  });
-});
+//   res.status(200).json({
+//     status: 'success',
+//     data: {
+//       favorite: updatedFavorite
+//     }
+//   });
+// });
 
-exports.getAllApproximiter = factory.getAll(aproximiter);
+exports.getAllApproximiter = catchAsync(async(req,res,next) =>{
+  if (!req.user.id) {
+    return next(new AppError("verifer votre token"))
+  }
+  const data = await aproximiter.find({userId: req.user.id});
+  res.status(200).send({data:data})
+})
+
+// exports.getAllApproximiter = factory.getAll(aproximiter);
+
+exports.getApproximiterByID = factory.getOne(aproximiter);
+exports.updateApproximiter = factory.updateOne(aproximiter);

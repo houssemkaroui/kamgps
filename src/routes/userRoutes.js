@@ -10,7 +10,7 @@ router.post(
   authController.signup
 );
 router.post('/login', authController.login);
-router.post('/loginAdmin', authController.loginAdmin);
+router.post('/SignIn', authController.loginAdmin);
 router.post('/codeVerification', authController.VeriferCodeSMS);
 router.post('/forgotPassword', authController.forgotPassword);
 router.patch('/resetPassword', authController.resetPassword);
