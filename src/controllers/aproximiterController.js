@@ -31,36 +31,43 @@ exports.GetListeAproximiter = catchAsync(async(req, res, next) => {
   var { data } = req.body;
   const parametre = "10000"
   var tableux = [];
-  const listeAproximiter = await aproximiter.find({ CountryCode: req.body.CountryCode })
-  for (var j = 0; j < listeAproximiter.length; j++) {
-    var distance = await getDistance(data, listeAproximiter[j].location, 0.01);
-    var results = await convertDistance(distance, "km");
-    if (results < parametre) {
-      await tableux.push(listeAproximiter[j])
-    }
-    var respence = await listeAproximiter.map((item) => {
-      var distance = getDistance(data, listeAproximiter[j].location, 0.01)
-      return {
-        name: item.name,
-          location: {
-              lat: item.location.lat,
-              lng: item.location.lng
-          },
-          userId:item.userId,
-          photo: item.photo,
-          CountryCode:item.CountryCode,
-          country:item.country,
-          addresse:item.addresse,
-          categorie:item.categorie,
-          status:item.status,
-          distance: convertDistance(distance, "km")
+  const listeAproximiter = await aproximiter.find({$and: [{ CountryCode: req.body.CountryCode },{ categorie: req.body.categorie }]});
+  if(listeAproximiter.length == 0) {
+    res.status(200).send({                         
+      results: listeAproximiter.length
+    })
+  }else {
+    for (var j = 0; j < listeAproximiter.length; j++) {
+      var distance = await getDistance(data, listeAproximiter[j].location, 0.01);
+      var results = await convertDistance(distance, "km");
+      if (results < parametre) {
+        await tableux.push(listeAproximiter[j])
       }
-  })
-  res.status(200).send({
-      data: [...respence],
-      results: [...respence].length
-  })
+      var respence = await listeAproximiter.map((item) => {
+        var distance = getDistance(data, listeAproximiter[j].location, 0.01)
+        return {
+          name: item.name,
+            location: {
+                lat: item.location.lat,
+                lng: item.location.lng
+            },
+            userId:item.userId,
+            photo: item.photo,
+            CountryCode:item.CountryCode,
+            country:item.country,
+            addresse:item.addresse,
+            categorie:item.categorie,
+            status:item.status,
+            distance: convertDistance(distance, "km")
+        }
+    })
+    res.status(200).send({
+        data: [...respence],
+        results: [...respence].length
+    })
+    }
   }
+
 
 });
 
@@ -83,6 +90,8 @@ function removeDuplicates(originalArray, prop) {
 //delete favorite
 exports.deleteFavorite = factory.deleteOne(aproximiter);
 const filterObj = (obj, ...allowedFields) => {
+
+
   const newObj = {};
   Object.keys(obj).forEach(el => {
     if (allowedFields.includes(el)) newObj[el] = obj[el];

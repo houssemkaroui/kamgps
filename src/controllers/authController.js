@@ -51,14 +51,14 @@ exports.login = catchAsync(async (req, res, next) => {
   // 2) Check if user exists && password is correct
   const user = await User.findOne({ phonenumber }).select('+password');
   if (!user) {
-    return next(new AppError("téléphone ou bien mot de passe incorrect", 400));
+    return next(new AppError("User Not found", 400));
   }
   if (user.active == false) {
     return next(new AppError("Vous n'avez pas les droits d'accés!", 400));
   }
 
   if (!user || !(await user.correctPassword(password, user.password))) {
-    return next(new AppError('Incorrect téléphone ou mot de passe inco', 401));
+    return next(new AppError('wrong Password', 401));
   }
 
   const token = await signToken(user._id);

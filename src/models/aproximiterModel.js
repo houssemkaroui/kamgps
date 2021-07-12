@@ -33,11 +33,11 @@ const aproximiterSchema = new mongoose.Schema({
     },
     country :{
         type:String,
-        required: [true, 'chaque lieux a un country']
+        // required: [true, 'chaque lieux a un country']
     },
     CountryCode:{
      type:String,
-     required: [true, 'chaque lieux a un CountryCode']
+    //  required: [true, 'chaque lieux a un CountryCode']
     },
     status: {
         type: String,

@@ -37,7 +37,7 @@ exports.GetListeFavorite = catchAsync(async(req,res,next) =>{
 });
 
 //update favorite
-//exports.updateFavorite = factory.updateOne(favorite);
+exports.updateFavorite = factory.updateOne(favorite);
 //delete favorite
 exports.deleteFavorite = factory.deleteOne(favorite);
 const filterObj = (obj, ...allowedFields) => {
@@ -48,22 +48,22 @@ const filterObj = (obj, ...allowedFields) => {
     return newObj;
   };
   
-exports.updateFavorite = catchAsync(async (req, res, next) => {
+// exports.updateFavorite = catchAsync(async (req, res, next) => {
   
-    // 2) Filtered out unwanted fields names that are not allowed to be updated
-    const filteredBody = filterObj(req.params.id,);
-    if (req.file) filteredBody.photo = req.file.filename;
+//     // 2) Filtered out unwanted fields names that are not allowed to be updated
+//     const filteredBody = filterObj(req.params.id,);
+//     if (req.file) filteredBody.photo = req.file.filename;
      
-    // 3) Update user document
-    const updatedFavorite = await favorite.findByIdAndUpdate(req.params.id, filteredBody, {
-      new: true,
-      runValidators: true
-    });
+//     // 3) Update user document
+//     const updatedFavorite = await favorite.findByIdAndUpdate(req.params.id, filteredBody, {
+//       new: true,
+//       runValidators: true
+//     });
   
-    res.status(200).json({
-      status: 'success',
-      data: {
-        favorite: updatedFavorite
-      }
-    });
-  });
+//     res.status(200).json({
+//       status: 'success',
+//       data: {
+//         favorite: updatedFavorite
+//       }
+//     });
+//   });

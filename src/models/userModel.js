@@ -47,7 +47,6 @@ const userSchema = new mongoose.Schema({
     required: [true, 'merci de saisir votre mots de passe'],
     minlength: 8,
     select: false
-    // validate: [validator.is, 'Please provide a valid email']
   },
   lat: {
     type: String,
